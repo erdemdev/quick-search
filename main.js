@@ -8,24 +8,27 @@ const {
   ipcMain,
   shell,
 } = require('electron');
-require('electron-reload')(__dirname);
+
+// Realtime reloads preload and renderer scripts. Good for dev environment.
+if (process.env.ELECTRON_DEV) require('electron-reload')(__dirname);
 
 //#region Constants
 const appIconMini = path.join(__dirname, '/assets/google_32x32.ico');
 const appName = require('./package.json').productName;
 //#endregion
 
-//#region Electron Store
 const store = new (require('electron-store'))({
   defaults: { autostart: true },
 });
 
-store.onDidChange('autostart', () =>
+const toggleAutostart = () =>
   app.setLoginItemSettings({
     openAtLogin: store.get('autostart'),
-  })
-);
-//#endregion
+  });
+
+toggleAutostart();
+
+store.onDidChange('autostart', () => toggleAutostart());
 
 //#region Native Elements
 function createTray() {
