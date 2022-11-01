@@ -1,0 +1,19 @@
+{
+  "name": "quick-search",
+  "productName": "Quick Search",
+  "description": "Opens Google in the default browser with the given query.",
+  "keywords": [],
+  "main": "./main.js",
+  "version": "1.0.0",
+  "author": "Erdem Arslan",
+  "scripts": {
+    "start": "set ELECTRON_DEV=true && electron .",
+    "prod": "electron ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "21.2.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-store": "^8.1.0"
+  }
+}
