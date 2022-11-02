@@ -8,7 +8,7 @@
   "author": "Erdem Arslan",
   "scripts": {
     "start": "set ELECTRON_DEV=true && electron .",
-    "prod": "electron-forge start",
+    "prod": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
