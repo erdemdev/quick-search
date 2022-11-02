@@ -59,6 +59,8 @@ function createTray() {
   return tray;
 }
 
+app.commandLine.appendSwitch('force_high_performance_gpu');
+
 function createSearchWindow() {
   // Create the browser window.
   const searchWindow = new BrowserWindow({
@@ -67,18 +69,13 @@ function createSearchWindow() {
     height: appHeight,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      devTools: process.env.ELECTRON_DEV,
     },
-    center: true,
     resizable: false,
-    useContentSize: true,
-    transparent: true,
     fullscreenable: false,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    hasShadow: false,
     frame: false,
     movable: false,
+    transparent: true,
+    skipTaskbar: true,
     x: -appWidth,
     y: -appHeight,
   });
@@ -86,8 +83,12 @@ function createSearchWindow() {
   // and load the index.html of the app.
   searchWindow.loadFile('index.html');
 
+  // Prevent showing taskbar on fullscreen apps.
+  searchWindow.setAlwaysOnTop(true, 'screen-saver');
+
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  if (process.env.ELECTRON_DEV) searchWindow.webContents.openDevTools();
+
   return searchWindow;
 }
 //#endregion
@@ -109,6 +110,9 @@ app.whenReady().then(() => {
     shell.openExternal('https://google.com/search?q=' + query);
     hideSearchWindow();
   });
+
+  if (!process.env.ELECTRON_DEV)
+    ipcMain.on('#searchInput:blur', () => hideSearchWindow());
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

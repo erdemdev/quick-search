@@ -6,6 +6,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   ipcRenderer.on('#searchInput:focus', () => searchInput.focus());
 
+  searchInput.addEventListener('blur', () =>
+    ipcRenderer.send('#searchInput:blur')
+  );
+
   searchForm.addEventListener('submit', e => {
     e.preventDefault();
     const query = searchInput.value;
