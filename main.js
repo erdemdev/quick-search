@@ -15,6 +15,8 @@ if (process.env.ELECTRON_DEV) require('electron-reload')(__dirname);
 //#region Constants
 const appIconMini = path.join(__dirname, '/assets/google_32x32.ico');
 const appName = require('./package.json').productName;
+const appWidth = 800;
+const appHeight = 100;
 //#endregion
 
 const store = new (require('electron-store'))({
@@ -61,8 +63,8 @@ function createSearchWindow() {
   // Create the browser window.
   const searchWindow = new BrowserWindow({
     icon: appIconMini,
-    width: 800,
-    height: 100,
+    width: appWidth,
+    height: appHeight,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       devTools: process.env.ELECTRON_DEV,
@@ -77,7 +79,8 @@ function createSearchWindow() {
     hasShadow: false,
     frame: false,
     movable: false,
-    show: false,
+    x: -appWidth,
+    y: -appHeight,
   });
 
   // and load the index.html of the app.
@@ -97,35 +100,37 @@ app.whenReady().then(() => {
   const tray = createTray();
   const searchWindow = createSearchWindow();
 
-  const toggleSearchWindow = () => {
-    if (!searchWindow.isVisible()) return searchWindow.show();
-    searchWindow.hide();
-  };
-
-  //#region Event Listeners
-  searchWindow.on('hide', () => globalShortcut.unregister('Enter'));
-  searchWindow.on('show', () => {
-    searchWindow.focus();
-    searchWindow.webContents.send('#searchInput:focus');
-  });
-  if (!process.env.ELECTRON_DEV)
-    searchWindow.on('blur', () => searchWindow.hide());
-
-  globalShortcut.register('Escape', () => searchWindow.hide());
   globalShortcut.register('Shift+Space', toggleSearchWindow);
-  tray.addListener('click', toggleSearchWindow);
+  globalShortcut.register('Escape', hideSearchWindow);
+  tray.addListener('click', showSearchWindow);
+  if (!process.env.ELECTRON_DEV) searchWindow.on('blur', hideSearchWindow);
 
   ipcMain.on('#searchForm:submit', (e, query) => {
     shell.openExternal('https://google.com/search?q=' + query);
-    searchWindow.hide();
+    hideSearchWindow();
   });
-  // #endregion
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createSearchWindow();
   });
+
+  function toggleSearchWindow() {
+    if (searchWindow.isFocused()) return hideSearchWindow();
+    showSearchWindow();
+  }
+
+  function showSearchWindow() {
+    searchWindow.center();
+    searchWindow.focus();
+    searchWindow.webContents.send('#searchInput:focus');
+  }
+
+  function hideSearchWindow() {
+    searchWindow.setPosition(-appWidth, -appHeight);
+    searchWindow.blur();
+  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
