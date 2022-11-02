@@ -7,7 +7,7 @@
   "version": "1.0.0",
   "author": "Erdem Arslan",
   "scripts": {
-    "start": "set ELECTRON_DEV=true && electron-forge start",
+    "start": "set ELECTRON_DEV=true && electron .",
     "prod": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
