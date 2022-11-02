@@ -102,7 +102,6 @@ app.whenReady().then(() => {
   const searchWindow = createSearchWindow();
 
   globalShortcut.register('Shift+Space', toggleSearchWindow);
-  globalShortcut.register('Escape', hideSearchWindow);
   tray.addListener('click', showSearchWindow);
   if (!process.env.ELECTRON_DEV) searchWindow.on('blur', hideSearchWindow);
 
@@ -129,11 +128,13 @@ app.whenReady().then(() => {
     searchWindow.center();
     searchWindow.focus();
     searchWindow.webContents.send('#searchInput:focus');
+    globalShortcut.register('Escape', hideSearchWindow);
   }
 
   function hideSearchWindow() {
     searchWindow.setPosition(-appWidth, -appHeight);
     searchWindow.blur();
+    globalShortcut.unregister('Escape');
   }
 });
 
