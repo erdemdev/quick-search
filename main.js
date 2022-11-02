@@ -117,8 +117,8 @@ app.whenReady().then(() => {
   });
 
   function toggleSearchWindow() {
-    if (searchWindow.isFocused()) return hideSearchWindow();
-    showSearchWindow();
+    if (searchWindow.getPosition()[0] === -appWidth) return showSearchWindow();
+    hideSearchWindow();
   }
 
   function showSearchWindow() {
